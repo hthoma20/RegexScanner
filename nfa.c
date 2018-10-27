@@ -9,6 +9,35 @@ nfa* makeNFA(){
 	return nfa;
 }
 
+/* concatenates m2 onto m1
+ */
+void concatNFAs(nfa* m1, nfa* m2){
+	//first, add all states from m2
+	stateNode* curr= m2->Q->head;
+	while(curr!= NULL){
+		pushState(m1->Q, curr->state);
+		curr= curr->next;
+	}
+
+	//adding the states gives all the old transititions
+	//now add the extra transitions for the concatenation
+	for(curr= m1->F->head; curr!= NULL; curr= curr->next){
+		addTransition(curr->state, '\0', m2->q0);
+	}
+
+	//remove accept states from m1
+	//free list structure, but not the states themselves
+	while(m1->F->head != NULL){
+		stateNode* temp= m1->F->head;
+		m1->F->head= m1->F->head->next;
+		free(temp);
+	}
+	free(m1->F);
+
+	//our accept states are exactly those from m2
+	m1->F= m2->F;
+}
+
 state* makeState(){
 	state* state= malloc(sizeof(state));
 	

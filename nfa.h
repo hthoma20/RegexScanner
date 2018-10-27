@@ -59,6 +59,13 @@ state* makeState();
  */
 nfa* makeNFA();
 
+/* alters m1 to be the concatenation of m1 and m2
+ * does not alter m2, however, the accept state set, F, of
+ * m1 is exactly the set from m2, so messing with m2's
+ * accept state may give unexpected behavior
+ */
+void concatNFAs(nfa* m1, nfa* m2);
+
 /* return the list of states that reading symbol from initstate
  * would bring the machine to
  */
