@@ -2,16 +2,10 @@
 #include <stdlib.h>
 #include "nfa.h"
 
-int main(int argc, char* argv[]){
-	stateList* list= makeStateList();
-
-	freeStateList(list);
-	return 0;
-}
-
 nfa* makeNFA(){
 	nfa* nfa = malloc(sizeof(nfa));
 	nfa->Q = makeStateList();
+	nfa->F = makeStateList();
 	return nfa;
 }
 
