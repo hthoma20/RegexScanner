@@ -9,6 +9,12 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
+nfa* makeNFA(){
+	nfa* nfa = malloc(sizeOf(nfa));
+	nfa->Q = makeStateList();
+	return nfa;
+}
+
 state* makeState(){
 	state* state= malloc(sizeof(state));
 	
@@ -75,6 +81,11 @@ void pushStateNode(stateList* list, stateNode* node){
 	list->size++;
 }
 
+void pushState(stateList* list, state* state){
+	stateNode* stateNode = malloc(sizeof(stateNode));
+	stateNode-> state = state;
+	pushStateNode(list, stateNode);
+}
 stateList* makeStateList(){
 	stateList* list= malloc(sizeof(stateList));
 	list->head= NULL;
