@@ -39,6 +39,10 @@ typedef struct nfa{
  */
 void pushStateNode(stateList* list, stateNode* node);
 
+/* push given state to the head of the list
+ */
+void pushState(stateList* list, state* state);
+
 /* push the given node onto the head of the given list
  */
 void pushTransNode(transList* list, transNode* node);
@@ -51,6 +55,10 @@ stateList* makeStateList();
  */
 state* makeState();
 
+/* creates an initialized nfa
+ */
+nfa* makeNFA();
+
 /* return the list of states that reading symbol from initstate
  * would bring the machine to
  */
@@ -60,6 +68,11 @@ stateList* readSymbol(state* initState, char symbol);
  * which moves the machine to finalState is symbol is read
  */
 void addTransition(state* initState, char symbol, state* finalState);
+
+/* tells whether state in in list 
+ */
+int containsState(stateList* list, state* state);
+
 
 /* tells whether the given state is an accept state of the given nfa
  */

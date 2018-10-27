@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
 }
 
 nfa* makeNFA(){
-	nfa* nfa = malloc(sizeOf(nfa));
+	nfa* nfa = malloc(sizeof(nfa));
 	nfa->Q = makeStateList();
 	return nfa;
 }
@@ -93,17 +93,20 @@ stateList* makeStateList(){
 	return list;
 }
 
-int isAcceptState(nfa* nfa, state* state){
+int containsState(stateList* list, state* state){
 	//traverse accept set, and look for the given state 
-	stateNode* curr= nfa->F->head;
+	stateNode* curr= list->head;
 	while(curr != NULL){
 		if(curr->state == state){
 			return 1;
 		}
 		curr= curr->next;
 	}
-
 	return 0;
+}
+
+int isAcceptState(nfa* nfa, state* state){
+	return containsState(nfa->F, state);
 }
 
 /* entirely frees all contents of the given stateList
