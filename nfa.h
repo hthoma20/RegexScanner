@@ -1,6 +1,9 @@
 #ifndef NFA_H
 #define NFA_H
 
+//epsilon transitions
+#define EPSILON '\0'
+
 typedef struct transition{
 	char symbol;
 	struct stateList* states;
@@ -17,6 +20,7 @@ typedef struct transList{
 
 typedef struct state{
 	transList* transitions;
+	int label;
 } state;
 
 typedef struct stateNode{
@@ -34,6 +38,19 @@ typedef struct nfa{
 	state* q0;
 	stateList* F;
 } nfa;
+
+/* returns the first state labeled with the given label
+ * in the given nfa
+ */
+state* getLabeledState(nfa* m, int label);
+
+/* puts unique labels on the states of the given NFA
+*/
+void labelNFA(nfa* m);
+
+/* print the given nfa
+*/
+void printNFA(nfa* m);
 
 /* push the given node onto the head of the given list
  */
@@ -55,6 +72,24 @@ stateList* makeStateList();
  */
 state* makeState();
 
+/* converts the given regular expression to an NFA
+	using the transformation
+*/
+nfa* regexToNFA(char* regex);
+
+/* returns the nfa which accpets nothing
+*/
+nfa* emptyNFA();
+
+/* returns the NFA which accpets {EPSILON}
+*/
+nfa* epsilonNFA();
+
+/* returns the NFA which accepts the string
+ * given by the single character, ch
+ */
+nfa* charNFA(char ch);
+
 /* creates an initialized nfa
  */
 nfa* makeNFA();
@@ -65,6 +100,18 @@ nfa* makeNFA();
  * accept state may give unexpected behavior
  */
 void concatNFAs(nfa* m1, nfa* m2);
+
+/* creates the union of two nfa's and returns a pointer to the new machine
+ * note that the union is created by makeing direct pointers to the states of
+ * m1 and m2.
+ * Therefore, altering the statelists may result in unexpected behavior
+ */
+nfa* unionNFAs(nfa* m1, nfa* m2);
+
+/* alters m to be the machine which accpets
+ * the language L(m)*
+ */
+void starNFA(nfa* m);
 
 /* return the list of states that reading symbol from initstate
  * would bring the machine to
@@ -110,5 +157,11 @@ void freeTransNode(transNode* node);
  * as well as the machine itself
  */
 void freeNFA(nfa* nfa);
+
+/* frees the structure memory for the machine nfa,
+ * but does not free the memory for the states themselves,
+ * nor their transitions
+ */
+void freeNFANotStates(nfa* nfa);
 
 #endif
