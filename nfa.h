@@ -94,24 +94,24 @@ nfa* charNFA(char ch);
  */
 nfa* makeNFA();
 
-/* alters m1 to be the concatenation of m1 and m2
- * does not alter m2, however, the accept state set, F, of
- * m1 is exactly the set from m2, so messing with m2's
- * accept state may give unexpected behavior
+/* concatenates m1 and m2
+ * returns the concatenated machine and frees
+ * excess memory.
+ * alters m1 and m2 beyond use.
  */
-void concatNFAs(nfa* m1, nfa* m2);
+nfa* concatNFAs(nfa* m1, nfa* m2);
 
 /* creates the union of two nfa's and returns a pointer to the new machine
  * note that the union is created by makeing direct pointers to the states of
  * m1 and m2.
- * Therefore, altering the statelists may result in unexpected behavior
+ * Also frees excess memory in m1 and m2, altering them beyond use
  */
 nfa* unionNFAs(nfa* m1, nfa* m2);
 
 /* alters m to be the machine which accpets
  * the language L(m)*
  */
-void starNFA(nfa* m);
+nfa* starNFA(nfa* m);
 
 /* return the list of states that reading symbol from initstate
  * would bring the machine to
