@@ -402,7 +402,7 @@ int isAcceptState(nfa* nfa, state* state){
 	return containsState(nfa->F, state);
 }
 
-configs runNFA(nfa* m, state* currState, char* str, int index){
+config* runNFA(nfa* m, state* currState, char* str, int index){
 	/*
 	if(!str && isAcceptState(m, currstate) = 1){
 		pushState(config->path, currState);
@@ -419,15 +419,16 @@ configs runNFA(nfa* m, state* currState, char* str, int index){
 		runNFA(m, temp, str+1);
 	}
 	*/
-	return null;
+	return NULL;
 
 
 }
 
 config* makeConfig(){
-	config* config = malloc(sizeof(config));
+	/*config* config = malloc(sizeof(config));
 	config->path = makeStateList();
-	config->stringIdx = int[];
+	config->stringIdx = int[];*/
+	return NULL;
 }
 
 /* entirely frees all contents of the given stateList

@@ -8,6 +8,7 @@ void testConcat();
 void testUnion();
 void testStar();
 void testRegexToNFA();
+void testRunNFA();
 
 int main(){
 	testNFA();
@@ -273,10 +274,10 @@ void testRegexToNFA(){
 
 void testRunNFADeterministic(){
 	//create an nfa
-	nfa* nfa= createNFA();
+	nfa* nfa= makeNFA();
 	
 	state* a= makeState();
-	state* b= makeState():
+	state* b= makeState();
 	state* c= makeState();
 	
 	addTransition(a, 'a', b);
@@ -289,7 +290,7 @@ void testRunNFADeterministic(){
 	
 	pushState(nfa->F, b);
 	
-	nfa->q0= q0;
+	nfa->q0= a;
 	
 	//run the nfa on a given string
 	config* config= runNFA(nfa, nfa->q0, "a", 0);
@@ -310,7 +311,7 @@ void testRunNFADeterministic(){
 	config= runNFA(nfa, nfa->q0, "abaa", 0);
 	
 	//check that the config is correct
-	configNode* curr= config->head;
+	curr= config->head;
 	assert(curr->state == a);
 	assert(curr->index == 0);
 	curr= curr->next;
@@ -374,7 +375,7 @@ void testRunNFANoEpsilon(){
 	config= runNFA(nfa, nfa->q0, "b", 0);
 
 	//check that the config is correct
-	configNode* curr= config->head;
+	curr= config->head;
 	assert(curr->state == a);
 	assert(curr->index == 0);
 	curr= curr->next;
@@ -389,7 +390,7 @@ void testRunNFANoEpsilon(){
 	config= runNFA(nfa, nfa->q0, "baa", 0);
 
 	//check that the config is correct
-	configNode* curr= config->head;
+	curr= config->head;
 	assert(curr->state == a);
 	assert(curr->index == 0);
 	curr= curr->next;
@@ -452,7 +453,7 @@ void testRunNFAEpsilon(){
 	config= runNFA(nfa, nfa->q0, "acc", 0);
 
 	//check that the config is correct
-	configNode* curr= config->head;
+	curr= config->head;
 	assert(curr->state == a);
 	assert(curr->index == 0);
 	curr= curr->next;
