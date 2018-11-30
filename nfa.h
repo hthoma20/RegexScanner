@@ -142,11 +142,16 @@ int containsState(stateList* list, state* state);
  */
 int isAcceptState(nfa* nfa, state* state);
 
+/*creates a new make configNode and returns it
+ */
+configNode* makeConfigNode(state* state, int idx)
+
 /* runs the string thru the nfa. 
  * returns null if nfa doesn't accept string
  * returns list of nodes it went thru to accept and index of string it was on during each node
  */
 config* runNFA(nfa* m, state* currState, char* str, int index);
+
 
 /* completely free all contents of a state list
  * and the list itself
