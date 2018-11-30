@@ -10,11 +10,12 @@ void testStar();
 void testRegexToNFA();
 
 int main(){
-	/*testNFA();
+	testNFA();
 	testConcat();
 	testUnion();
-	testStar();*/
+	testStar();
 	testRegexToNFA();
+	testRunNFA();
 	printf("All tests passed\n");
 	return 0;
 }
@@ -150,6 +151,11 @@ void testRegexToNFANoUnion(){
 	assert(m->Q->size == 7);
 	assert(m->F->size == 1);
 	
+	//to create this test, we printed the nfa with labels
+	//and verified that it was the correct NFA
+	//now we are asserting that we get that same NFA
+	//(the labels should be the same)
+	
 	state* a= getLabeledState(m, 2);
 	state* b= getLabeledState(m, 6);
 	state* c= getLabeledState(m, 5);
@@ -186,6 +192,11 @@ void testRegexToNFAUnion(){
 	
 	assert(nfa->Q->size == 18);
 	assert(nfa->F->size == 2);
+	
+	//to create this test, we printed the nfa with labels
+	//and verified that it was the correct NFA
+	//now we are asserting that we get that same NFA
+	//(the labels should be the same)
 	
 	state* a= getLabeledState(nfa, 0);
 	state* b= getLabeledState(nfa, 13);
@@ -258,4 +269,74 @@ void testRegexToNFAUnion(){
 void testRegexToNFA(){
 	testRegexToNFANoUnion();
 	testRegexToNFAUnion();
+}
+
+void testRunNFADeterministic(){
+	//create an nfa
+	nfa* nfa= createNFA();
+	
+	state* a= makeState();
+	state* b= makeState():
+	state* c= makeState();
+	
+	addTransition(a, 'a', b);
+	addTransition(b, 'b', c);
+	addTransition(c, 'a', a);
+	
+	pushState(nfa->Q, a);
+	pushState(nfa->Q, b);
+	pushState(nfa->Q, c);
+	
+	pushState(nfa->F, b);
+	
+	nfa->q0= q0;
+	
+	//run the nfa on a given string
+	config* config= runNFA(nfa, nfa->q0, "a", 0);
+	
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 2);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	//test a harder string
+	config= runNFA(nfa, nfa->q0, "abaa", 0);
+	
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 1);
+	curr= curr->next;
+	assert(curr->state == c);
+	assert(curr->index == 2);
+	curr= curr->next;
+	assert(curr->state == a);
+	assert(curr->index == 3);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 4);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	//test a fail
+	config= runNFA(nfa, nfa->q0, "ab", 0);
+	assert(config == NULL);
+	
+	freeNFA(nfa);
+}
+
+void testRunNFA(){
+	testRunNFADeterministic();
 }
