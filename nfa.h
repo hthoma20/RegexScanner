@@ -43,7 +43,7 @@ typedef struct configNode{
 	state* state;
 	int index;
 	struct configNode* next;
-} configNode
+} configNode;
 
 typedef struct config{
 	configNode* head;

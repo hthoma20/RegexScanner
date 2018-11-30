@@ -402,7 +402,7 @@ int isAcceptState(nfa* nfa, state* state){
 	return containsState(nfa->F, state);
 }
 
-configs runNFA(nfa* m, state* currState, char* str){
+configs runNFA(nfa* m, state* currState, char* str, int index){
 	/*
 	if(!str && isAcceptState(m, currstate) = 1){
 		pushState(config->path, currState);

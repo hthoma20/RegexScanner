@@ -337,6 +337,149 @@ void testRunNFADeterministic(){
 	freeNFA(nfa);
 }
 
+void testRunNFANoEpsilon(){
+	//make an nfa
+	nfa* nfa= makeNFA();
+	
+	state* a= makeState();
+	state* b= makeState();
+	
+	addTransition(a, 'a', b);
+	addTransition(a, 'b', b);
+	addTransition(b, 'a', a);
+	
+	pushState(nfa->Q, a);
+	pushState(nfa->Q, b);
+	
+	pushState(nfa->F, b);
+	
+	nfa->q0= a;
+	
+	//run the nfa on a string
+	config* config= runNFA(nfa, nfa->q0, "a", 0);
+
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 1);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	//try a diffent string
+	config= runNFA(nfa, nfa->q0, "b", 0);
+
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 1);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	//try a diffent string
+	config= runNFA(nfa, nfa->q0, "baa", 0);
+
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 1);
+	curr= curr->next;
+	assert(curr->state == a);
+	assert(curr->index == 2);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 3);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	//try a fail
+	config= runNFA(nfa, nfa->q0, "ba", 0);
+	assert(config == NULL);
+	
+	freeNFA(nfa);
+}
+
+
+void testRunNFAEpsilon(){
+	//make an nfa
+	nfa* nfa= makeNFA();
+	
+	state* a= makeState();
+	state* b= makeState();
+	
+	addTransition(a, 'a', b);
+	addTransition(a, 'b', b);
+	addTransition(a, EPSILON, b);
+	addTransition(b, 'c', a);
+	
+	pushState(nfa->Q, a);
+	pushState(nfa->Q, b);
+	
+	pushState(nfa->F, b);
+	
+	nfa->q0= a;
+	
+	//run the nfa on a string
+	config* config= runNFA(nfa, nfa->q0, "a", 0);
+
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 1);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	//try another string
+	config= runNFA(nfa, nfa->q0, "acc", 0);
+
+	//check that the config is correct
+	configNode* curr= config->head;
+	assert(curr->state == a);
+	assert(curr->index == 0);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 1);
+	curr= curr->next;
+	assert(curr->state == a);
+	assert(curr->index == 2);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 2);
+	curr= curr->next;
+	assert(curr->state == a);
+	assert(curr->index == 3);
+	curr= curr->next;
+	assert(curr->state == b);
+	assert(curr->index == 3);
+	curr= curr->next;
+	assert(curr == NULL);
+	
+	freeConfig(config);
+	
+	freeNFA(nfa);
+}
+
 void testRunNFA(){
 	testRunNFADeterministic();
+	testRunNFANoEpsilon();
+	testRunNFAEpsilon();
 }
