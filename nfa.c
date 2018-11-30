@@ -68,9 +68,11 @@ void printNFA(nfa* m){
 	}
 }
 
-/* concatenates m2 onto m1
+/* concatenates m1 and m2
+ * returns the concatenated machine
+ * and frees memory used by m1 and m2
  */
-void concatNFAs(nfa* m1, nfa* m2){
+nfa* concatNFAs(nfa* m1, nfa* m2){
 	//first, add all states from m2
 	stateNode* curr= m2->Q->head;
 	while(curr!= NULL){
@@ -95,6 +97,19 @@ void concatNFAs(nfa* m1, nfa* m2){
 
 	//our accept states are exactly those from m2
 	m1->F= m2->F;
+	
+	//free the memory from m2
+	curr= m2->Q->head;
+	while(curr != NULL){
+		stateNode* temp= curr;
+		curr= curr->next;
+		free(temp);
+	}
+	free(m2->Q);
+		
+	free(m2);
+	
+	return m1;
 }
 
 /* unions m1 and m2
@@ -131,12 +146,16 @@ nfa* unionNFAs(nfa* m1, nfa* m2){
 	pushState(u->Q, q0);
 	u->q0= q0;
 	
+	//free up memory no longer used from m1 and m2
+	freeNFANotStates(m1);
+	freeNFANotStates(m2);
+	
 	return u;
 }
 
-/* alters m by making it accept L(m)* (star operation)
+/* returns the machine which accpets L(m)* (star operation)
 */
-void starNFA(nfa* m){
+nfa* starNFA(nfa* m){
 	//first add epsilon transions from each accept state to the
 	//original start state
 	stateNode* curr;
@@ -153,6 +172,8 @@ void starNFA(nfa* m){
 	//add the state and set this state to be the start state
 	pushState(m->Q, q0);
 	m->q0= q0;
+	
+	return m;
 }
 
 /* converts the given regex to an nfa
@@ -198,27 +219,24 @@ nfa* regexToNFA(char* regex){
 	//if we found a top-level union
 	if(unionIndex != -1){
 		//get the regexs on each side of the union
-		char* firstRegex= malloc(sizeof(char)*unionIndex);
-		char* secondRegex= malloc(sizeof(char)*(len-unionIndex-1));
+		char* firstRegex= malloc(sizeof(char)*unionIndex+1);
+		char* secondRegex= malloc(sizeof(char)*(len-unionIndex));
 		
 		strncpy(firstRegex, regex, unionIndex);
 		strncpy(secondRegex, regex+unionIndex+1, len-unionIndex-1);
+		
+		firstRegex[unionIndex]= '\0';
+		secondRegex[len-unionIndex-1]= '\0';
 		
 		//create the corresponding nfas
 		nfa* firstNFA= regexToNFA(firstRegex);
 		nfa* secondNFA= regexToNFA(secondRegex);
 		
-		//union them
-		nfa* m= unionNFAs(firstNFA, secondNFA);
-		
-		//free the excess
 		free(firstRegex);
 		free(secondRegex);
-		freeNFANotStates(firstNFA);
-		freeNFANotStates(secondNFA);
-	
-		//return the union
-		return m;
+		
+		//union them
+		return unionNFAs(firstNFA, secondNFA);
 	}
 	
 	//if there was no union to worry about,
@@ -230,34 +248,25 @@ nfa* regexToNFA(char* regex){
 	}
 	else{
 		//create the machine for the regex inside the parens
-		char* newRegex= malloc(sizeof(char)*(unitIndex-1));
+		char* newRegex= malloc(sizeof(char)*(unitIndex));
 		strncpy(newRegex, regex+1, unitIndex-1);
+		newRegex[unitIndex-1]= '\0';
 		firstPart= regexToNFA(newRegex);
-		//free(newRegex);
+		free(newRegex);
 	}
 
 	//now, check if we should star it
 	if(regex[unitIndex+1] == '*'){
-		starNFA(firstPart);
+		firstPart= starNFA(firstPart);
 		//unitIndex is location of last character in first part
 		unitIndex++;
 	}
 	
 	//make the nfa for the second part
 	nfa* secondPart= regexToNFA(regex+unitIndex+1);
+	
 	//finally, concat the first part with the rest
-	concatNFAs(firstPart, secondPart);
-	
-	//free up the excess memory
-	stateNode* curr;
-	for(curr= secondPart->Q->head; curr != NULL; curr= curr->next){
-		free(curr);
-	}
-	free(secondPart->Q);
-	free(secondPart);
-	
-	//return the machine
-	return firstPart;
+	return concatNFAs(firstPart, secondPart);
 }
 
 /* returns the nfa that accepts nothing
@@ -324,27 +333,26 @@ stateList* readSymbol(state* initState, char symbol){
 }
 
 void addTransition(state* initState, char symbol, state* finalState){
-	stateNode* finalStateNode= malloc(sizeof(stateNode));
-	finalStateNode->state= finalState;
-	
 	//first check if symbol is already in the transition map
 	transNode* curr= initState->transitions->head;
 	while(curr != NULL){
 		//if we found the symbol
 		if(curr->transition->symbol == symbol){
 			//add this state to the transition
-			pushStateNode(curr->transition->states, finalStateNode);
+			pushState(curr->transition->states, finalState);
 			return;
 		}
 		curr= curr->next;
 	}
+	
 	//here, we didn't find the symbol, so we add it
 	transition* trans= malloc(sizeof(transition));
 	trans->symbol= symbol;
-	trans->states= malloc(sizeof(stateList));
-	pushStateNode(trans->states, finalStateNode);
+	trans->states= makeStateList();
+	pushState(trans->states, finalState);
 
 	transNode* node= malloc(sizeof(transNode));
+	node->next = NULL;
 	node->transition= trans;
 
 	pushTransNode(initState->transitions, node);
@@ -370,6 +378,7 @@ void pushState(stateList* list, state* state){
 	stateNode-> state = state;
 	pushStateNode(list, stateNode);
 }
+
 stateList* makeStateList(){
 	stateList* list= malloc(sizeof(stateList));
 	list->head= NULL;

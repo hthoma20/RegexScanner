@@ -10,10 +10,10 @@ void testStar();
 void testRegexToNFA();
 
 int main(){
-	testNFA();
+	/*testNFA();
 	testConcat();
 	testUnion();
-	testStar();
+	testStar();*/
 	testRegexToNFA();
 	printf("All tests passed\n");
 	return 0;
@@ -45,24 +45,6 @@ void testNFA(){
 	
 	freeNFA(nfa);
 }
-/*
-void testNFA(){
-	nfa* nfa= makeNFA();
-	
-	state* q0 = makeState();
-	state* q1 = makeState();
-	
-	pushState(nfa->Q, q0);
-	pushState(nfa->Q, q1);
-	
-	addTransition(q0,'a',q1);
-	
-	pushState(nfa->F, q1);
-	
-	nfa->q0= q0;
-	
-	freeNFA(nfa);
-}*/
 
 void testConcat(){
 	//make two nfa's
@@ -71,10 +53,11 @@ void testConcat(){
 	pushState(m1->Q, q0);
 	state* q1= makeState();
 	pushState(m1->Q, q1);
+	
 	addTransition(q0,'a',q1);
 	m1->q0= q0;
 	pushState(m1->F, q1);
-
+	
 	nfa* m2= makeNFA();
 	state* q2= makeState();
 	pushState(m2->Q, q2);
@@ -85,7 +68,7 @@ void testConcat(){
 	pushState(m2->F, q3);	
 
 	//concatenate them
-	concatNFAs(m1, m2);
+	m1= concatNFAs(m1, m2);
 
 	//check we have the right machine
 	assert(m1->Q->size == 4);
@@ -146,13 +129,15 @@ void testStar(){
 	pushState(m1->F, q1);
 	
 	//star it
-	starNFA(m1);
+	m1= starNFA(m1);
 	
 	//make sure we have the right machine
 	assert(m1->Q->size == 3);
 	assert(m1->F->size == 2);
 	assert(containsState(readSymbol(q1, EPSILON), q0));
 	assert(containsState(readSymbol(m1->q0, EPSILON), q0));
+	
+	freeNFA(m1);
 }
 
 void testRegexToNFANoUnion(){
@@ -161,7 +146,6 @@ void testRegexToNFANoUnion(){
 	nfa* m= regexToNFA(regex);
 	
 	labelNFA(m);
-	//printNFA(m);
 	
 	assert(m->Q->size == 7);
 	assert(m->F->size == 1);
@@ -199,7 +183,6 @@ void testRegexToNFAUnion(){
 	nfa* nfa= regexToNFA(regex);
 	
 	labelNFA(nfa);
-	//printNFA(nfa);
 	
 	assert(nfa->Q->size == 18);
 	assert(nfa->F->size == 2);
@@ -269,10 +252,10 @@ void testRegexToNFAUnion(){
 	
 	assert(isAcceptState(nfa, r));
 	
-	free(nfa);
+	freeNFA(nfa);
 }
 
 void testRegexToNFA(){
-	// testRegexToNFAUnion();
-	// testRegexToNFANoUnion();
+	testRegexToNFANoUnion();
+	testRegexToNFAUnion();
 }

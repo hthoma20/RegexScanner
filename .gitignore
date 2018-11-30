@@ -2,3 +2,6 @@
 *.o
 main
 test
+
+#log files
+out.txt
