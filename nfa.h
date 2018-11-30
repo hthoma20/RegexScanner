@@ -45,9 +45,9 @@ typedef struct configNode{
 	struct configNode* next;
 } configNode
 
-typedef struct configs{
+typedef struct config{
 	configNode* head;
-} configs;
+} config;
 
 /* returns the first state labeled with the given label
  * in the given nfa
@@ -146,7 +146,14 @@ int isAcceptState(nfa* nfa, state* state);
  * returns null if nfa doesn't accept string
  * returns list of nodes it went thru to accept and index of string it was on during each node
  */
-configs runNFA(nfa* m, state* currState, char* str);
+configs* runNFA(nfa* m, state* currState, char* str);
+
+
+/*creates a new make configNode and returns it
+ */
+configNode* makeConfigNode(state* state, int idx)
+
+
 
 /* completely free all contents of a state list
  * and the list itself
