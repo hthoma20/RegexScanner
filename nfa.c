@@ -409,7 +409,6 @@ config* runNFA(nfa* m, state* currState, char* str, int index){
 		config->head = node;
 		return config;
 	}
-	
 	if(strlen(str) == 0 && isAcceptState(m, currState) == 0 && readSymbol(currState, EPSILON) == NULL){
 		return NULL;
 	}
