@@ -43,7 +43,7 @@ typedef struct configNode{
 	state* state;
 	int index;
 	struct configNode* next;
-} configNode
+} configNode;
 
 typedef struct config{
 	configNode* head;
@@ -144,7 +144,7 @@ int isAcceptState(nfa* nfa, state* state);
 
 /*creates a new make configNode and returns it
  */
-configNode* makeConfigNode(state* state, int idx)
+configNode* makeConfigNode(state* state, int idx);
 
 /* runs the string thru the nfa. 
  * returns null if nfa doesn't accept string

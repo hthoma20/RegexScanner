@@ -402,32 +402,43 @@ int isAcceptState(nfa* nfa, state* state){
 	return containsState(nfa->F, state);
 }
 
-configs runNFA(nfa* m, state* currState, char* str){
-	/*
-	if(!str && isAcceptState(m, currstate) = 1){
-		pushState(config->path, currState);
-		
+config* runNFA(nfa* m, state* currState, char* str, int index){
+	configNode* node = makeConfigNode(currState, index);
+	if(strlen(str) == 0 && isAcceptState(m, currState) == 1){
+		config* config = malloc(sizeof(config));
+		config->head = node;
 		return config;
 	}
 	
-	if(!str && isAcceptState(m, currState) = 0 &&   ){
+	if(strlen(str) == 0 && isAcceptState(m, currState) == 0 && readSymbol(currState, EPSILON) == NULL){
 		return NULL;
 	}
 	
-	stateList* options = readSymbol(currState, str[0]);
-	for(temp = option->head, temp != NULL, temp = temp->next){
-		runNFA(m, temp, str+1);
+	stateList* options = readSymbol(currState, str[index]);
+	stateNode* temp;
+	for(temp = options->head; temp != NULL; temp = temp->next){
+		config* temp1 = runNFA(m, temp->state, str, index+1);
+		node->next = temp1->head;
+		temp1->head = node;
+		return temp1;
 	}
-	*/
-	return null;
-
-
+	
+	options = readSymbol(currState, EPSILON);
+	for(temp = options->head; temp != NULL; temp = temp->next){
+		config* temp1 = runNFA(m, temp->state, str, index);
+		node->next = temp1->head;
+		temp1->head = node;
+		return temp1;
+	}
+	
+	return NULL;
 }
 
-config* makeConfig(){
-	config* config = malloc(sizeof(config));
-	config->path = makeStateList();
-	config->stringIdx = int[];
+configNode* makeConfigNode(state* state, int idx){
+	configNode* node = malloc(sizeof(configNode));
+	node->state = state; 
+	node->index = idx;
+	return node;
 }
 
 /* entirely frees all contents of the given stateList
