@@ -524,3 +524,16 @@ void freeNFANotStates(nfa* nfa){
 	//free the nfa itself
 	free(nfa);
 }
+
+void freeConfig(config* config){
+	//free each node in the list
+	configNode* curr;
+	while(curr != NULL){
+		configNode* temp= curr;
+		curr= curr->next;
+		free(temp);
+	}
+	
+	//free the congif itself
+	free(config);
+}
