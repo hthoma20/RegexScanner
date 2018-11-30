@@ -393,6 +393,34 @@ int isAcceptState(nfa* nfa, state* state){
 	return containsState(nfa->F, state);
 }
 
+configs runNFA(nfa* m, state* currState, char* str){
+	/*
+	if(!str && isAcceptState(m, currstate) = 1){
+		pushState(config->path, currState);
+		
+		return config;
+	}
+	
+	if(!str && isAcceptState(m, currState) = 0 &&   ){
+		return NULL;
+	}
+	
+	stateList* options = readSymbol(currState, str[0]);
+	for(temp = option->head, temp != NULL, temp = temp->next){
+		runNFA(m, temp, str+1);
+	}
+	*/
+	return null;
+
+
+}
+
+config* makeConfig(){
+	config* config = malloc(sizeof(config));
+	config->path = makeStateList();
+	config->stringIdx = int[];
+}
+
 /* entirely frees all contents of the given stateList
  */
 void freeStateList(stateList* list){

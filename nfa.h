@@ -39,6 +39,16 @@ typedef struct nfa{
 	stateList* F;
 } nfa;
 
+typedef struct configNode{
+	state* state;
+	int index;
+	struct configNode* next;
+} configNode
+
+typedef struct configs{
+	configNode* head;
+} configs;
+
 /* returns the first state labeled with the given label
  * in the given nfa
  */
@@ -131,6 +141,12 @@ int containsState(stateList* list, state* state);
 /* tells whether the given state is an accept state of the given nfa
  */
 int isAcceptState(nfa* nfa, state* state);
+
+/* runs the string thru the nfa. 
+ * returns null if nfa doesn't accept string
+ * returns list of nodes it went thru to accept and index of string it was on during each node
+ */
+configs runNFA(nfa* m, state* currState, char* str);
 
 /* completely free all contents of a state list
  * and the list itself
