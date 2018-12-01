@@ -35,8 +35,8 @@ typedef struct stateList{
 
 typedef struct nfa{
 	stateList* Q;
-	state* q0;
 	stateList* F;
+	state* q0;
 } nfa;
 
 typedef struct configNode{

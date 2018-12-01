@@ -16,7 +16,7 @@ int main(){
 	testUnion();
 	testStar();
 	testRegexToNFA();
-	//testRunNFA();
+	testRunNFA();
 	printf("All tests passed\n");
 	return 0;
 }
@@ -294,14 +294,14 @@ void testRunNFADeterministic(){
 	
 	//run the nfa on a given string
 	config* config= runNFA(nfa, nfa->q0, "a", 0);
-	
+	assert(config != NULL);
 	//check that the config is correct
 	configNode* curr= config->head;
 	assert(curr->state == a);
 	assert(curr->index == 0);
 	curr= curr->next;
 	assert(curr->state == b);
-	assert(curr->index == 2);
+	assert(curr->index == 1);
 	curr= curr->next;
 	assert(curr == NULL);
 	
@@ -309,7 +309,7 @@ void testRunNFADeterministic(){
 	
 	//test a harder string
 	config= runNFA(nfa, nfa->q0, "abaa", 0);
-	
+	assert(config != NULL);
 	//check that the config is correct
 	curr= config->head;
 	assert(curr->state == a);
@@ -328,6 +328,7 @@ void testRunNFADeterministic(){
 	assert(curr->index == 4);
 	curr= curr->next;
 	assert(curr == NULL);
+	
 	
 	freeConfig(config);
 	
@@ -470,7 +471,7 @@ void testRunNFAEpsilon(){
 	assert(curr->index == 3);
 	curr= curr->next;
 	assert(curr->state == b);
-	assert(curr->index == 3);
+	assert(curr->index == 4);
 	curr= curr->next;
 	assert(curr == NULL);
 	

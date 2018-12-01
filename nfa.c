@@ -4,9 +4,9 @@
 #include "nfa.h"
 
 nfa* makeNFA(){
-	nfa* nfa = malloc(sizeof(nfa));
-	nfa->Q = makeStateList();
+	nfa* nfa = malloc(sizeof(struct nfa));
 	nfa->F = makeStateList();
+	nfa->Q = makeStateList();
 	return nfa;
 }
 
@@ -309,9 +309,9 @@ nfa* charNFA(char ch){
 }
 
 state* makeState(){
-	state* state= malloc(sizeof(state));
+	state* state= malloc(sizeof(struct state));
 	
-	transList* transitions= malloc(sizeof(transList));
+	transList* transitions= malloc(sizeof(struct transList));
 	transitions->head= NULL;
 
 	state->transitions= transitions;
@@ -346,12 +346,12 @@ void addTransition(state* initState, char symbol, state* finalState){
 	}
 	
 	//here, we didn't find the symbol, so we add it
-	transition* trans= malloc(sizeof(transition));
+	transition* trans= malloc(sizeof(struct transition));
 	trans->symbol= symbol;
 	trans->states= makeStateList();
 	pushState(trans->states, finalState);
 
-	transNode* node= malloc(sizeof(transNode));
+	transNode* node= malloc(sizeof(struct transNode));
 	node->next = NULL;
 	node->transition= trans;
 
@@ -374,13 +374,13 @@ void pushStateNode(stateList* list, stateNode* node){
 }
 
 void pushState(stateList* list, state* state){
-	stateNode* stateNode = malloc(sizeof(stateNode));
+	stateNode* stateNode = malloc(sizeof(struct stateNode));
 	stateNode-> state = state;
 	pushStateNode(list, stateNode);
 }
 
 stateList* makeStateList(){
-	stateList* list= malloc(sizeof(stateList));
+	stateList* list= malloc(sizeof(struct stateList));
 	list->head= NULL;
 	list->size= 0;
 	return list;
@@ -404,39 +404,44 @@ int isAcceptState(nfa* nfa, state* state){
 
 config* runNFA(nfa* m, state* currState, char* str, int index){
 	configNode* node = makeConfigNode(currState, index);
-	if(strlen(str) == 0 && isAcceptState(m, currState) == 1){
-		config* config = malloc(sizeof(config));
+	if(str[index] == '\0' && isAcceptState(m, currState)){
+		config* config = malloc(sizeof(struct config));
 		config->head = node;
 		return config;
 	}
-	if(strlen(str) == 0 && isAcceptState(m, currState) == 0 && readSymbol(currState, EPSILON) == NULL){
+	if(str[index] == '\0' && !isAcceptState(m, currState) && readSymbol(currState, EPSILON) == NULL){
 		return NULL;
 	}
 	
 	stateList* options = readSymbol(currState, str[index]);
 	stateNode* temp;
-	for(temp = options->head; temp != NULL; temp = temp->next){
-		config* temp1 = runNFA(m, temp->state, str, index+1);
-		node->next = temp1->head;
-		temp1->head = node;
-		return temp1;
+	if(options != NULL){
+		for(temp = options->head; temp != NULL; temp = temp->next){
+			config* temp1 = runNFA(m, temp->state, str, index+1);
+			if(temp1 == NULL) continue;
+			node->next = temp1->head;
+			temp1->head = node;
+			return temp1;
+		}
 	}
-	
 	options = readSymbol(currState, EPSILON);
-	for(temp = options->head; temp != NULL; temp = temp->next){
-		config* temp1 = runNFA(m, temp->state, str, index);
-		node->next = temp1->head;
-		temp1->head = node;
-		return temp1;
+	if(options != NULL){
+		for(temp = options->head; temp != NULL; temp = temp->next){
+			config* temp1 = runNFA(m, temp->state, str, index);
+			if(temp1 == NULL) continue;
+			node->next = temp1->head;
+			temp1->head = node;
+			return temp1;
+		}
 	}
-	
 	return NULL;
 }
 
 configNode* makeConfigNode(state* state, int idx){
-	configNode* node = malloc(sizeof(configNode));
+	configNode* node = malloc(sizeof(struct configNode));
 	node->state = state; 
 	node->index = idx;
+	node->next = NULL;
 	return node;
 }
 
@@ -536,8 +541,12 @@ void freeNFANotStates(nfa* nfa){
 }
 
 void freeConfig(config* config){
+	if(config == NULL){
+		printf("NULL config passsed at freeConfig\n");
+		return;
+	}
 	//free each node in the list
-	configNode* curr;
+	configNode* curr= config->head;
 	while(curr != NULL){
 		configNode* temp= curr;
 		curr= curr->next;
