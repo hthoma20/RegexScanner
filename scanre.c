@@ -3,6 +3,14 @@
 #include <string.h>
 #include "scanre.h"
 
+int fscanre(FILE* file, cRegex* cRegex, ...){
+	return 0;
+}
+
+int scanString(cRegex* cRegex, char* str, ...){
+	return 0;
+}
+
 cRegex* makeCRegex(char* regex){
 	//make the cRegex
 	cRegex* cRegex= malloc(sizeof(struct cRegex));
