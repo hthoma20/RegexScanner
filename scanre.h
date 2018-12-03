@@ -26,12 +26,16 @@ typedef struct cRegex{
 //returns a boolean as to whether the scan was successful
 int fscanre(FILE* file, cRegex* cRegex, ...);
 
-//takes a cRegex, a string, and a list of char**
+//takes a cRegex, a string, and an array of char**
 //attempts to match the string with the cRegex
 //if the string matches, it allocates memory for and populates each
 //given char** with the captured string, and returns 1
 //if the string does not match, returns 0 and does nothing with the char**s
+<<<<<<< HEAD
 int scanString(cRegex* cRegex, char* str, char*** captureVars);
+=======
+int scanString(cRegex* cRegex, char* str,  char*** captureVars);
+>>>>>>> 9fde848a6e32484783e57d8dc63b5b79fc8c5478
 
 //returns a cRegex structure based on the given regular expression
 cRegex* makeCRegex(char* regex);

@@ -1,14 +1,88 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "scanre.h"
 #include <stdarg.h>
 
+//doubles the length of the given string by
+//setting it to a new array, copying the original, and
+//filling with \0
+//returns the length of the longest string now possible
+int doubleString(char** str, int srcSize){
+	int newSize= 2*srcSize;
+	char* dest= malloc(sizeof(char)*(newSize+1));
+	
+	strncpy(dest, *str, srcSize);
+	memset(dest + srcSize, 0, newSize+1-srcSize); 
+	
+	free(*str);
+	*str= dest;
+	return newSize;
+}
+
 int fscanre(FILE* file, cRegex* cRegex, ...){
+	//get the current position of the file in case we
+	//fail and must reset it
+	int beginFilePos= ftell(file);
+	
+	//count how many captures we are doing
+	int numCaps= 0;
+	captureNode* curr;
+	for(curr= cRegex->captureHead; curr != NULL; curr= curr->next){
+		numCaps++;
+	}
+	
+	//make the array of capture variables, an array of char**
+	char*** captureVars= malloc(sizeof(char**) * numCaps);
+	
+	//iterate the array and get the args out
+	va_list argList;
+	va_start(argList, cRegex);
+	int i= 0;
+	for(curr= cRegex->captureHead; curr != NULL; curr= curr->next){
+		captureVars[i++]= va_arg(argList, char**);
+	}
+	va_end(argList);
+	
+	
+	//make a string that will hold the current string to check
+	int maxLen= 100;
+	//set all to 0 so we know each string is null terminated
+	char* currString= calloc(maxLen+1, sizeof(char));
+	
+	//start trying each string
+	int len= 0;
+	int ch= fgetc(file);
+	
+	while(ch != EOF){
+		//before we store, make sure we have a place
+		if(len == maxLen){
+			maxLen= doubleString(&currString, maxLen);
+		}
+		
+		currString[len]= ch;
+		len++;
+		
+		//try to match and capture the current string
+		if(scanString(cRegex, currString, captureVars)){
+			free(captureVars);
+			return 1;
+		}
+		
+		//get the next character
+		ch= fgetc(file);
+	}
+	
+	//if we get out of the loop, it is a failure
+	//reset the file pointer and return false
+	fseek(file, 0, beginFilePos);
+	free(captureVars);
 	return 0;
 }
 
 int scanString(cRegex* cRegex, char* str, char*** captureVars){
+<<<<<<< HEAD
 	config* config = runNFA(cRegex->m, cRegex->m->q0, str, 0);
 	//if the string doesn't accept in NFA return 0
 	if(config == NULL){
@@ -43,6 +117,9 @@ int scanString(cRegex* cRegex, char* str, char*** captureVars){
 		strncpy(*saveVar,str+startIndex, endIndex-startIndex-1);
 	}
 	return 1;
+=======
+	return 0;
+>>>>>>> 9fde848a6e32484783e57d8dc63b5b79fc8c5478
 }
 	
 cRegex* makeCRegex(char* regex){

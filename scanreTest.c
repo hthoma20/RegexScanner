@@ -1,12 +1,18 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 #include "scanre.h"
 
 void testMakeCRegex();
+void testScanString();
+void testFscanre();
 
 int main(){
 	testMakeCRegex();
+	testScanString();
+	testFscanre();
 	printf("All tests passed\n");
 }
 
@@ -49,4 +55,112 @@ void testMakeCRegex(){
 	assert(containsState(testRegex->captureHead->end, c));	
 	
 	freeCRegex(testRegex);
+}
+
+void testScanString(){
+	//make the cRegex
+	cRegex* creg= makeCRegex("<a*>b");
+	
+	char* var;
+	
+	char** list[]= {&var};
+	
+	int success= scanString(creg, "aab", list);
+	
+	
+	assert(success);
+	assert(strcmp(var, "aa") == 0);
+	
+	free(var);
+	
+	success= scanString(creg, "b", list);
+
+	assert(success);
+	assert(strcmp(var, "") == 0);
+	
+	free(var);
+	freeCRegex(creg);
+	
+	//try another regex
+	creg= makeCRegex("<a*>b<c*>");
+	char* var2;
+	char** list2[]= {&var, &var2};
+	
+	success= scanString(creg, "aabccc", list2);
+	
+	assert(success);
+	assert(strcmp(var, "aa") == 0);
+	assert(strcmp(var2, "cc") == 0);
+	
+	free(var);
+	free(var2);
+	
+	//try another string
+	success= scanString(creg, "bccc", list2);
+	
+	assert(success);
+	assert(strcmp(var, "") == 0);
+	assert(strcmp(var2, "cc") == 0);
+	
+	free(var);
+	free(var2);
+	
+	//try another string
+	success= scanString(creg, "ab", list2);
+	
+	assert(success);
+	assert(strcmp(var, "a") == 0);
+	assert(strcmp(var2, "") == 0);
+	
+	free(var);
+	free(var2);
+	
+	//try another string
+	
+	success= scanString(creg, "b", list2);
+	
+	assert(success);
+	assert(strcmp(var, "") == 0);
+	assert(strcmp(var2, "") == 0);
+	
+	free(var);
+	free(var2);
+	
+	freeCRegex(creg);
+}
+
+void testFscanre(){
+	//get the file
+	FILE* file= fopen("test1.txt", "r");
+	
+	//make the cRegex
+	cRegex* creg= makeCRegex("<a*>b");
+	
+	char* var;
+	
+	//try a scan
+	int success= fscanre(file, creg, &var);
+	
+	assert(success);
+	assert(strcmp(var, "aaa") == 0);
+	
+	free(var);
+	
+	//try another
+	success= fscanre(file, creg, &var);
+	
+	assert(success);
+	assert(strcmp(var, "a") == 0);
+	
+	free(var);
+	
+	//try another
+	success= fscanre(file, creg, &var);
+	
+	assert(success);
+	assert(strcmp(var, "") == 0);
+	
+	free(var);
+	
+	freeCRegex(creg);
 }
