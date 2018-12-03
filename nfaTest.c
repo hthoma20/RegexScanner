@@ -110,6 +110,7 @@ void testUnion(){
 	assert(u->Q->size == 5);
 	
 	stateList* q0Transitions= readSymbol(u->q0, EPSILON);
+	assert(q0Transitions != NULL);
 	assert(q0Transitions->size == 2);
 	assert(containsState(q0Transitions, q0));
 	assert(containsState(q0Transitions, q2));
