@@ -410,11 +410,26 @@ config* runNFA(nfa* m, state* currState, char* str, int index){
 		return config;
 	}
 	if(str[index] == '\0' && !isAcceptState(m, currState) && readSymbol(currState, EPSILON) == NULL){
+		free(node);
 		return NULL;
 	}
 	
-	stateList* options = readSymbol(currState, str[index]);
+	stateList* options = readSymbol(currState, EPSILON);
 	stateNode* temp;
+	if(options != NULL){
+		for(temp = options->head; temp != NULL; temp = temp->next){
+			//try to run the nfa starting at the next state
+			config* temp1 = runNFA(m, temp->state, str, index);
+			//if we fail, try the next state
+			if(temp1 == NULL) continue;
+			//otherwise, push the current configNode onto the config
+			node->next = temp1->head;
+			temp1->head = node;
+			return temp1;
+		}
+	}
+	
+	options = readSymbol(currState, str[index]);
 	if(options != NULL){
 		for(temp = options->head; temp != NULL; temp = temp->next){
 			config* temp1 = runNFA(m, temp->state, str, index+1);
@@ -424,16 +439,8 @@ config* runNFA(nfa* m, state* currState, char* str, int index){
 			return temp1;
 		}
 	}
-	options = readSymbol(currState, EPSILON);
-	if(options != NULL){
-		for(temp = options->head; temp != NULL; temp = temp->next){
-			config* temp1 = runNFA(m, temp->state, str, index);
-			if(temp1 == NULL) continue;
-			node->next = temp1->head;
-			temp1->head = node;
-			return temp1;
-		}
-	}
+	
+	free(node);
 	return NULL;
 }
 

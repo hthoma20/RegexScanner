@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include "scanre.h"
 
+int scanreHelper(FILE* file, cRegex* cRegex, char*** captureVars);
+
 //doubles the length of the given string by
 //setting it to a new array, copying the original, and
 //filling with \0
@@ -20,13 +22,7 @@ int doubleString(char** str, int srcSize){
 	return newSize;
 }
 
-int fscanre(FILE* file, cRegex* cRegex, ...){
-	if(!file) return NULL;
-	
-	//get the current position of the file in case we
-	//fail and must reset it
-	int beginFilePos= ftell(file);
-	
+int scanre(cRegex* cRegex, ...){	
 	//count how many captures we are doing
 	int numCaps= 0;
 	captureNode* curr;
@@ -46,6 +42,44 @@ int fscanre(FILE* file, cRegex* cRegex, ...){
 	}
 	va_end(argList);
 	
+	int returnVal= scanreHelper(stdin, cRegex, captureVars);
+	free(captureVars);
+	
+	return returnVal;
+}
+
+int fscanre(FILE* file, cRegex* cRegex, ...){
+	//count how many captures we are doing
+	int numCaps= 0;
+	captureNode* curr;
+	for(curr= cRegex->captureHead; curr != NULL; curr= curr->next){
+		numCaps++;
+	}
+	
+	//make the array of capture variables, an array of char**
+	char*** captureVars= malloc(sizeof(char**) * numCaps);
+	
+	//iterate the array and get the args out
+	va_list argList;
+	va_start(argList, cRegex);
+	int i= 0;
+	for(curr= cRegex->captureHead; curr != NULL; curr= curr->next){
+		captureVars[i++]= va_arg(argList, char**);
+	}
+	va_end(argList);
+	
+	int returnVal= scanreHelper(file, cRegex, captureVars);
+	free(captureVars);
+	
+	return returnVal;
+}
+
+int scanreHelper(FILE* file, cRegex* cRegex, char*** captureVars){
+	if(!file) return 0;
+	
+	//get the current position of the file in case we
+	//fail and must reset it
+	int beginFilePos= ftell(file);
 	
 	//make a string that will hold the current string to check
 	int maxLen= 100;
@@ -67,7 +101,7 @@ int fscanre(FILE* file, cRegex* cRegex, ...){
 		
 		//try to match and capture the current string
 		if(scanString(cRegex, currString, captureVars)){
-			free(captureVars);
+			free(currString);
 			return 1;
 		}
 		
@@ -78,12 +112,14 @@ int fscanre(FILE* file, cRegex* cRegex, ...){
 	//if we get out of the loop, it is a failure
 	//reset the file pointer and return false
 	fseek(file, 0, beginFilePos);
-	free(captureVars);
+	free(currString);
+	
 	return 0;
 }
 
 int scanString(cRegex* cRegex, char* str, char*** captureVars){
 	config* config = runNFA(cRegex->m, cRegex->m->q0, str, 0);
+	
 	//if the string doesn't accept in NFA return 0
 	if(config == NULL){
 		return 0;
@@ -119,6 +155,8 @@ int scanString(cRegex* cRegex, char* str, char*** captureVars){
 		strncpy(*saveVar,str+startIndex, endIndex-startIndex);
 		(*saveVar)[endIndex-startIndex] = '\0';
 	}
+	
+	freeConfig(config);
 	return 1;
 }
 	
