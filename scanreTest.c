@@ -80,7 +80,6 @@ void testScanString(){
 	
 	free(var);
 	freeCRegex(creg);
-	
 	//try another regex
 	creg= makeCRegex("<a*>b<c*>");
 	char* var2;
