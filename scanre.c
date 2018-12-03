@@ -2,15 +2,49 @@
 #include <stdio.h>
 #include <string.h>
 #include "scanre.h"
+#include <stdarg.h>
 
 int fscanre(FILE* file, cRegex* cRegex, ...){
 	return 0;
 }
 
-int scanString(cRegex* cRegex, char* str, ...){
-	return 0;
+int scanString(cRegex* cRegex, char* str, char*** captureVars){
+	config* config = runNFA(cRegex->m, cRegex->m->q0, str, 0);
+	//if the string doesn't accept in NFA return 0
+	if(config == NULL){
+		return 0;
+	}
+	//outer loop goes through each capture node
+	int i = 0;
+	captureNode* captureNodeTemp = NULL;
+	for(captureNodeTemp=cRegex->captureHead; captureNodeTemp != NULL; captureNodeTemp = captureNodeTemp->next){
+		char** saveVar= captureVars[i];
+		i++;
+		int startIndex;
+		int endIndex;
+		configNode* configTemp = NULL;
+		
+		//goes through and finds the beginning of the capture in the string
+		for( configTemp=config->head; configTemp != NULL; configTemp=configTemp->next){
+			if(configTemp->state == captureNodeTemp->begin){
+				startIndex = configTemp->index;
+				break;
+			}
+		}
+		//goes through config list and finds the last occurance of ends
+		for( configTemp=config->head; configTemp != NULL; configTemp=configTemp->next){
+			state* endsTemp = NULL;
+			//check to see if the current configNode's state is equal to end temp
+			if(containsState(captureNodeTemp->end, configTemp->state)){
+				endIndex = configTemp->index;
+			}
+		}
+		*saveVar = malloc(sizeof(char)*(endIndex-startIndex+1));
+		strncpy(*saveVar,str+startIndex, endIndex-startIndex-1);
+	}
+	return 1;
 }
-
+	
 cRegex* makeCRegex(char* regex){
 	//make the cRegex
 	cRegex* cRegex= malloc(sizeof(struct cRegex));

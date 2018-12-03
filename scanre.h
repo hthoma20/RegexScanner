@@ -31,7 +31,7 @@ int fscanre(FILE* file, cRegex* cRegex, ...);
 //if the string matches, it allocates memory for and populates each
 //given char** with the captured string, and returns 1
 //if the string does not match, returns 0 and does nothing with the char**s
-int scanString(cRegex* cRegex, char* str, ...);
+int scanString(cRegex* cRegex, char* str, char*** captureVars);
 
 //returns a cRegex structure based on the given regular expression
 cRegex* makeCRegex(char* regex);
