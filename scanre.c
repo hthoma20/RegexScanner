@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdarg.h>
 #include "scanre.h"
-#include <stdarg.h>
 
 //doubles the length of the given string by
 //setting it to a new array, copying the original, and
@@ -22,6 +21,8 @@ int doubleString(char** str, int srcSize){
 }
 
 int fscanre(FILE* file, cRegex* cRegex, ...){
+	if(!file) return NULL;
+	
 	//get the current position of the file in case we
 	//fail and must reset it
 	int beginFilePos= ftell(file);
@@ -82,17 +83,18 @@ int fscanre(FILE* file, cRegex* cRegex, ...){
 }
 
 int scanString(cRegex* cRegex, char* str, char*** captureVars){
-<<<<<<< HEAD
 	config* config = runNFA(cRegex->m, cRegex->m->q0, str, 0);
 	//if the string doesn't accept in NFA return 0
 	if(config == NULL){
 		return 0;
 	}
+	
+	char** saveVar = NULL;
 	//outer loop goes through each capture node
 	int i = 0;
 	captureNode* captureNodeTemp = NULL;
 	for(captureNodeTemp=cRegex->captureHead; captureNodeTemp != NULL; captureNodeTemp = captureNodeTemp->next){
-		char** saveVar= captureVars[i];
+		saveVar = captureVars[i];
 		i++;
 		int startIndex;
 		int endIndex;
@@ -114,12 +116,10 @@ int scanString(cRegex* cRegex, char* str, char*** captureVars){
 			}
 		}
 		*saveVar = malloc(sizeof(char)*(endIndex-startIndex+1));
-		strncpy(*saveVar,str+startIndex, endIndex-startIndex-1);
+		strncpy(*saveVar,str+startIndex, endIndex-startIndex);
+		(*saveVar)[endIndex-startIndex] = '\0';
 	}
 	return 1;
-=======
-	return 0;
->>>>>>> 9fde848a6e32484783e57d8dc63b5b79fc8c5478
 }
 	
 cRegex* makeCRegex(char* regex){

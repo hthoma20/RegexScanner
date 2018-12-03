@@ -67,8 +67,9 @@ void testScanString(){
 	
 	int success= scanString(creg, "aab", list);
 	
-	
+	printf("poop");
 	assert(success);
+	printf("%s\n", var);
 	assert(strcmp(var, "aa") == 0);
 	
 	free(var);
@@ -90,17 +91,17 @@ void testScanString(){
 	
 	assert(success);
 	assert(strcmp(var, "aa") == 0);
-	assert(strcmp(var2, "cc") == 0);
+	assert(strcmp(var2, "ccc") == 0);
 	
 	free(var);
 	free(var2);
 	
 	//try another string
 	success= scanString(creg, "bccc", list2);
-	
 	assert(success);
 	assert(strcmp(var, "") == 0);
-	assert(strcmp(var2, "cc") == 0);
+	assert(strcmp(var2, "ccc") == 0);
+	
 	
 	free(var);
 	free(var2);
@@ -116,7 +117,6 @@ void testScanString(){
 	free(var2);
 	
 	//try another string
-	
 	success= scanString(creg, "b", list2);
 	
 	assert(success);
@@ -127,6 +127,7 @@ void testScanString(){
 	free(var2);
 	
 	freeCRegex(creg);
+	
 }
 
 void testFscanre(){
