@@ -4,24 +4,17 @@
 #include <stdarg.h>
 #include <string.h>
 #include "scanre.h"
+#include "scanreTest.h"
 
 void testMakeCRegex();
 void testScanString();
 void testFscanre();
 
-int main(){
+void testScanreC(){
 	testMakeCRegex();
 	testScanString();
 	testFscanre();
-	printf("All tests passed\n");
-	
-	// cRegex* creg= makeCRegex("<a*>b");
-	// nfa* m= regexToNFA("a*b");
-	// config* config= runNFA(m, m->q0, "ab", 0);
-	
-	// freeNFA(m);
-	// freeConfig(config);
-	// freeCRegex(creg);
+	printf("All scanre tests passed\n");
 }
 
 void testMakeCRegex(){
@@ -75,8 +68,8 @@ void testScanString(){
 	
 	int success= scanString(creg, "aab", list);
 	
-	// assert(success);
-	// assert(strcmp(var, "aa") == 0);
+	assert(success);
+	assert(strcmp(var, "aa") == 0);
 	
 	free(var);
 	

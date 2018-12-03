@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "nfa.h"
+#include "nfaTest.h"
 
 void testNFA();
 void testConcat();
@@ -10,15 +11,14 @@ void testStar();
 void testRegexToNFA();
 void testRunNFA();
 
-int main(){
+void testNfaC(){
 	testNFA();
 	testConcat();
 	testUnion();
 	testStar();
 	testRegexToNFA();
 	testRunNFA();
-	printf("All tests passed\n");
-	return 0;
+	printf("All nfa tests passed\n");
 }
 
 void testNFA(){
@@ -472,7 +472,7 @@ void testRunNFAEpsilon(){
 	assert(curr->index == 3);
 	curr= curr->next;
 	assert(curr->state == b);
-	assert(curr->index == 4);
+	assert(curr->index == 3);
 	curr= curr->next;
 	assert(curr == NULL);
 	
